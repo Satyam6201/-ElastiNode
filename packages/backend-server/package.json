@@ -1,0 +1,16 @@
+{
+  "name": "@elastinode/backend-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@elastinode/shared": "*",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "pidusage": "^3.0.2"
+  }
+}
