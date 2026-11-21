@@ -1,39 +1,33 @@
 services:
-  load-balancer:
+  backend:
     build:
-      context: .
-      dockerfile: packages/load-balancer/Dockerfile
-    container_name: elastinode-lb
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: elastinode-backend
     ports:
       - "8080:8080"
       - "8081:8081"
-    environment:
-      - LB_PORT=8080
-      - LB_ADMIN_PORT=8081
-      - ADMIN_TOKEN=change-me
-      - NODE_ENV=production
-    networks:
-      - elastinode-net
-
-  autoscaler:
-    build:
-      context: .
-      dockerfile: packages/autoscaler/Dockerfile
-    container_name: elastinode-autoscaler
-    ports:
       - "9000:9000"
     environment:
-      - AUTOSCALER_PORT=9000
       - LB_PORT=8080
       - LB_ADMIN_PORT=8081
-      - LB_URL=http://load-balancer:8080
-      - LB_ADMIN_URL=http://load-balancer:8081
+      - AUTOSCALER_PORT=9000
       - ADMIN_TOKEN=change-me
       - MIN_SERVERS=2
       - MAX_SERVERS=10
       - NODE_ENV=production
+    networks:
+      - elastinode-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: elastinode-frontend
+    ports:
+      - "3000:80"
     depends_on:
-      - load-balancer
+      - backend
     networks:
       - elastinode-net
 

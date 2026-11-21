@@ -56,6 +56,66 @@ ElastiNode is an autonomous auto-scaling distributed system with a live reverse 
 
 ---
 
+## 📂 Project Structure
+
+```
+ElastiNode/
+├── backend/
+│   ├── src/
+│   │   ├── config.js               (Configuration settings)
+│   │   ├── logger.js               (Pino logger)
+│   │   ├── index.js                (Main backend entry: starts LB and Autoscaler)
+│   │   ├── server/                 (Worker Express app dynamically spawned)
+│   │   │   ├── index.js
+│   │   │   └── routes.js           (/health, /work, /cpu, /metrics)
+│   │   ├── load-balancer/          (Reverse proxy, algorithms, health checker, admin API)
+│   │   │   ├── index.js
+│   │   │   ├── pool.js
+│   │   │   ├── healthChecker.js
+│   │   │   ├── metricsCollector.js
+│   │   │   ├── adminApi.js
+│   │   │   └── algorithms/
+│   │   │       ├── index.js
+│   │   │       ├── roundRobin.js
+│   │   │       ├── leastConnections.js
+│   │   │       ├── weightedRoundRobin.js
+│   │   │       └── ipHash.js
+│   │   ├── autoscaler/             (Control loop, policy engine, process provisioner, sqlite)
+│   │   │   ├── index.js
+│   │   │   ├── controller.js
+│   │   │   ├── policy.js
+│   │   │   ├── metricsStore.js
+│   │   │   ├── processProvisioner.js
+│   │   │   ├── baseProvisioner.js
+│   │   │   ├── db.js
+│   │   │   ├── api.js
+│   │   │   └── socket.js
+│   │   └── load-tester/            (Autocannon traffic benchmarking)
+│   │       └── run.js
+│   ├── test/
+│   │   ├── algorithms.test.js
+│   │   ├── policy.test.js
+│   │   └── integration.test.js
+│   └── package.json
+├── frontend/                       (React + Vite + Tailwind CSS dashboard)
+│   ├── src/
+│   │   ├── components/             (StatCards, ServerGrid, RpsChart, LatencyChart, etc.)
+│   │   ├── hooks/useSocket.js      (Real-time Socket.IO & REST data hook)
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   └── package.json
+├── package.json
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
 ## 🌟 Key Features
 
 1. **Intelligent Load Balancer (`:8080` / Admin `:8081`)**

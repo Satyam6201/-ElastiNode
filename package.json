@@ -5,16 +5,16 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "start": "node scripts/start-all.js",
-    "dev": "node scripts/start-all.js",
-    "dev:dashboard": "npm run dev --workspace=@elastinode/dashboard",
-    "dev:lb": "node packages/load-balancer/src/index.js",
-    "dev:autoscaler": "node packages/autoscaler/src/index.js",
-    "build": "npm run build --workspace=@elastinode/dashboard",
-    "loadtest": "node packages/load-tester/src/run.js",
+    "start": "node backend/src/index.js",
+    "dev": "concurrently \"node backend/src/index.js\" \"npm run dev --prefix frontend\"",
+    "dev:backend": "node backend/src/index.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "loadtest": "node backend/src/load-tester/run.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
