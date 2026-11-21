@@ -19,14 +19,16 @@ export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
       icon: Activity,
       color: 'text-teal-400',
       bg: 'bg-teal-500/10 border-teal-500/20',
+      span: '',
     },
     {
       title: 'Active Connections',
       value: activeConns.toLocaleString(),
-      subtext: 'In-flight client sockets',
+      subtext: 'In-flight sockets',
       icon: Zap,
       color: 'text-amber-400',
       bg: 'bg-amber-500/10 border-amber-500/20',
+      span: '',
     },
     {
       title: 'Response Latency',
@@ -35,44 +37,47 @@ export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
       icon: Clock,
       color: avgLatency > 400 ? 'text-rose-400' : 'text-blue-400',
       bg: avgLatency > 400 ? 'bg-rose-500/10 border-rose-500/20' : 'bg-blue-500/10 border-blue-500/20',
+      span: '',
     },
     {
       title: 'Fleet Capacity',
       value: `${currentCount} / ${maxCount}`,
-      subtext: `Min fleet target: ${minCount}`,
+      subtext: `Min fleet: ${minCount}`,
       icon: Server,
       color: 'text-emerald-400',
       bg: 'bg-emerald-500/10 border-emerald-500/20',
+      span: '',
     },
     {
       title: 'Autoscaler State',
       value: isScaling ? 'Scaling...' : mode === 'paused' ? 'Paused' : 'Active (Auto)',
-      subtext: isScaling ? 'Adjusting backend fleet' : 'Control loop running (5s)',
+      subtext: isScaling ? 'Adjusting fleet' : 'Loop running (5s)',
       icon: mode === 'paused' ? AlertTriangle : ShieldCheck,
       color: isScaling ? 'text-purple-400 animate-pulse' : mode === 'paused' ? 'text-amber-400' : 'text-teal-400',
       bg: isScaling ? 'bg-purple-500/10 border-purple-500/20' : 'bg-slate-800/50 border-slate-700/50',
+      span: 'col-span-2 sm:col-span-1 lg:col-span-1',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
       {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
           <div
             key={idx}
-            className={`p-4 rounded-xl border backdrop-blur-md transition-all hover:scale-[1.01] ${card.bg}`}
+            className={`p-3 sm:p-4 rounded-xl border backdrop-blur-md transition-all hover:scale-[1.01] ${card.bg} ${card.span}`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <span className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider truncate">
                 {card.title}
               </span>
-              <Icon className={`w-4 h-4 ${card.color}`} />
+              <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${card.color}`} />
             </div>
-            <div className="text-2xl font-bold tracking-tight text-white mb-1">
+            <div className="text-lg sm:text-2xl font-bold tracking-tight text-white mb-0.5 sm:mb-1 truncate">
               {card.value}
             </div>
-            <div className="text-xs text-slate-400">{card.subtext}</div>
+            <div className="text-[11px] sm:text-xs text-slate-400 truncate">{card.subtext}</div>
           </div>
         );
       })}
