@@ -1,10 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
+import Database from 'better-sqlite3';
 import { createLogger } from '../logger.js';
 
-const require = createRequire(import.meta.url);
 const logger = createLogger('autoscaler-db');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,41 +13,32 @@ export class DatabaseService {
   constructor(dbPath = defaultDbPath) {
     this.dbPath = dbPath;
     this.db = null;
-    this.driver = 'none';
+    this.isMemory = false;
+    this.memoryStore = { events: [], metrics: [], policy: null };
     this.init();
   }
 
   init() {
-    const dir = path.dirname(this.dbPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
     try {
-      const BetterSqlite = require('better-sqlite3');
-      this.db = new BetterSqlite(this.dbPath);
-      this.driver = 'better-sqlite3';
-      logger.info({ path: this.dbPath, driver: 'better-sqlite3' }, 'SQLite database initialized');
-    } catch {
-      try {
-        const { DatabaseSync } = require('node:sqlite');
-        this.db = new DatabaseSync(this.dbPath);
-        this.driver = 'node:sqlite';
-        logger.info({ path: this.dbPath, driver: 'node:sqlite' }, 'SQLite database initialized');
-      } catch (err) {
-        logger.warn({ err: err.message }, 'Native SQLite not available; using in-memory store');
-        this.driver = 'memory';
-        this.memoryStore = { events: [], metrics: [], policy: null };
+      const dir = path.dirname(this.dbPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
       }
-    }
 
-    this.createTables();
+      this.db = new Database(this.dbPath);
+      this.createTables();
+      logger.info({ path: this.dbPath }, 'SQLite database initialized');
+    } catch (err) {
+      logger.warn({ err: err.message }, 'SQLite initialization fallback to in-memory store');
+      this.isMemory = true;
+      this.db = null;
+    }
   }
 
   createTables() {
-    if (this.driver === 'memory') return;
+    if (this.isMemory || !this.db) return;
 
-    const schema = `
+    this.db.exec(`
       CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ts INTEGER,
@@ -74,25 +64,16 @@ export class DatabaseService {
         id INTEGER PRIMARY KEY,
         json TEXT
       );
-    `;
-
-    this.exec(schema);
-  }
-
-  exec(sql) {
-    if (this.driver === 'better-sqlite3' || this.driver === 'node:sqlite') {
-      this.db.exec(sql);
-    }
+    `);
   }
 
   insertEvent({ type, serverId = null, reason = '', serversBefore = 0, serversAfter = 0, metrics = {} }) {
     const ts = Date.now();
     const metricsJson = JSON.stringify(metrics);
 
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       const id = this.memoryStore.events.length + 1;
-      const row = { id, ts, type, serverId, reason, serversBefore, serversAfter, metricsJson };
-      this.memoryStore.events.unshift(row);
+      this.memoryStore.events.unshift({ id, ts, type, serverId, reason, serversBefore, serversAfter, metricsJson });
       return id;
     }
 
@@ -105,23 +86,20 @@ export class DatabaseService {
   }
 
   getEvents(limit = 50) {
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       return this.memoryStore.events.slice(0, limit);
     }
 
-    const stmt = this.db.prepare(`
-      SELECT * FROM events ORDER BY ts DESC LIMIT ?
-    `);
+    const stmt = this.db.prepare(`SELECT * FROM events ORDER BY ts DESC LIMIT ?`);
     return stmt.all(limit);
   }
 
   insertMetric({ rps = 0, avgLatency = 0, p95Latency = 0, cpuAvg = 0, activeConns = 0, serverCount = 0, errorRate = 0 }) {
     const ts = Date.now();
 
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       const id = this.memoryStore.metrics.length + 1;
-      const row = { id, ts, rps, avgLatency, p95Latency, cpuAvg, activeConns, serverCount, errorRate };
-      this.memoryStore.metrics.push(row);
+      this.memoryStore.metrics.push({ id, ts, rps, avgLatency, p95Latency, cpuAvg, activeConns, serverCount, errorRate });
       return id;
     }
 
@@ -136,33 +114,29 @@ export class DatabaseService {
   getMetrics(rangeMs = 15 * 60 * 1000) {
     const since = Date.now() - rangeMs;
 
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       return this.memoryStore.metrics.filter((m) => m.ts >= since);
     }
 
-    const stmt = this.db.prepare(`
-      SELECT * FROM metrics WHERE ts >= ? ORDER BY ts ASC
-    `);
+    const stmt = this.db.prepare(`SELECT * FROM metrics WHERE ts >= ? ORDER BY ts ASC`);
     return stmt.all(since);
   }
 
   pruneMetrics(olderThanMs = 24 * 60 * 60 * 1000) {
     const threshold = Date.now() - olderThanMs;
 
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       this.memoryStore.metrics = this.memoryStore.metrics.filter((m) => m.ts >= threshold);
       return;
     }
 
-    const stmt = this.db.prepare(`
-      DELETE FROM metrics WHERE ts < ?
-    `);
+    const stmt = this.db.prepare(`DELETE FROM metrics WHERE ts < ?`);
     stmt.run(threshold);
   }
 
   savePolicy(policyObject) {
     const json = JSON.stringify(policyObject);
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       this.memoryStore.policy = json;
       return;
     }
@@ -175,7 +149,7 @@ export class DatabaseService {
   }
 
   getPolicy() {
-    if (this.driver === 'memory') {
+    if (this.isMemory || !this.db) {
       return this.memoryStore.policy ? JSON.parse(this.memoryStore.policy) : null;
     }
 
@@ -185,8 +159,9 @@ export class DatabaseService {
   }
 
   close() {
-    if (this.db && typeof this.db.close === 'function') {
+    if (this.db) {
       this.db.close();
+      this.db = null;
     }
   }
 }

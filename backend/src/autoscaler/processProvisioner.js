@@ -1,17 +1,18 @@
+import { EventEmitter } from 'node:events';
 import { fork } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createLogger } from '../logger.js';
-import { BaseProvisioner } from './baseProvisioner.js';
 
 const logger = createLogger('process-provisioner');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const backendScriptPath = path.resolve(__dirname, '../server/index.js');
 
-export class ProcessProvisioner extends BaseProvisioner {
+export class ProcessProvisioner extends EventEmitter {
   constructor(options = {}) {
-    super('process');
+    super();
+    this.name = 'process';
     this.basePort = options.basePort || 4001;
     this.instances = new Map();
     this.nextServerNumber = 1;
@@ -32,6 +33,28 @@ export class ProcessProvisioner extends BaseProvisioner {
       id = `srv-${this.nextServerNumber++}`;
     }
     return id;
+  }
+
+  async waitForHealth(url, timeoutMs = 30000) {
+    const startTime = Date.now();
+    const probeUrl = `${url.replace(/\/$/, '')}/health`;
+
+    while (Date.now() - startTime < timeoutMs) {
+      try {
+        const res = await fetch(probeUrl, { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+          const body = await res.json().catch(() => null);
+          if (body && body.status === 'ok') {
+            return true;
+          }
+        }
+      } catch (_err) {
+        void _err;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    throw new Error(`Health check timed out after ${timeoutMs}ms for ${probeUrl}`);
   }
 
   async start(options = {}) {
