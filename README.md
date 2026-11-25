@@ -1,4 +1,4 @@
-# ElastiNode ⚡
+# ElastiNode
 
 > **"Servers that grow when traffic grows, and shrink when it doesn't."**
 
