@@ -7,7 +7,6 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node src/index.js",
-    "test": "vitest run",
     "loadtest": "node src/load-tester/run.js"
   },
   "dependencies": {
