@@ -1,12 +1,10 @@
 # ElastiNode
 
-> **"Servers that grow when traffic grows, and shrink when it doesn't."**
-
-ElastiNode is an autonomous auto-scaling distributed system with a live reverse proxy Load Balancer, dynamic backend server pool management, graceful connection draining, SQLite event persistence, and a real-time React + Tailwind CSS dashboard.
+Autonomous auto-scaling distributed system with a reverse proxy Load Balancer, dynamic backend server pool management, connection draining, SQLite event persistence, and a real-time React + Tailwind CSS dashboard.
 
 ---
 
-## 🏗 High-Level Architecture
+## Architecture
 
 ```
                  Clients & Browsers
@@ -56,7 +54,7 @@ ElastiNode is an autonomous auto-scaling distributed system with a live reverse 
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 ElastiNode/
@@ -111,7 +109,7 @@ ElastiNode/
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 1. **Intelligent Load Balancer (`:8080` / Admin `:8081`)**
    - Pluggable load balancing algorithms: `round-robin`, `least-connections`, `weighted-round-robin`, `ip-hash`.
@@ -150,7 +148,7 @@ ElastiNode/
 
 ---
 
-## 📋 Port Allocations
+## Port Allocations
 
 | Service                 | Port    | Description                                                     |
 | ----------------------- | ------- | --------------------------------------------------------------- |
@@ -162,7 +160,7 @@ ElastiNode/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -190,7 +188,7 @@ Open your browser to:
 
 ---
 
-## 🧪 Demo Walkthrough
+## Demo Walkthrough
 
 ### Scenario 1: Verify Round-Robin Load Balancing
 
@@ -232,7 +230,7 @@ Send 10 requests to the Load Balancer:
 
 ---
 
-## ⚙️ Configuration (.env)
+## Configuration (.env)
 
 ```env
 LB_PORT=8080
@@ -252,7 +250,7 @@ NODE_ENV=development
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 To launch ElastiNode using Docker Compose:
 
@@ -264,7 +262,7 @@ This builds and starts the Load Balancer and Autoscaler container fleet in an is
 
 ---
 
-## 🛠 Development Scripts
+## Development Scripts
 
 | Command                | Action                                                                      |
 | ---------------------- | --------------------------------------------------------------------------- |
@@ -278,6 +276,6 @@ This builds and starts the Load Balancer and Autoscaler container fleet in an is
 
 ---
 
-## 📜 License
+## License
 
-MIT &copy; 2026 ElastiNode Team
+MIT (c) 2026 ElastiNode Team
