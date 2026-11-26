@@ -9,8 +9,9 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { Activity } from 'lucide-react';
 
-export function RpsChart({ data }) {
+export function RpsChart({ data = [] }) {
   const chartData = (data || []).map((d) => ({
     time: new Date(d.ts).toLocaleTimeString([], {
       hour: '2-digit',
@@ -21,69 +22,91 @@ export function RpsChart({ data }) {
     activeConnections: d.activeConnections || d.activeConns || 0,
   }));
 
+  const latestRps = chartData.length > 0 ? chartData[chartData.length - 1].rps : 0;
+  const latestConns = chartData.length > 0 ? chartData[chartData.length - 1].activeConnections : 0;
+
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 sm:p-5 backdrop-blur-md">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 sm:mb-4">
+    <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-zinc-800/80">
         <div>
-          <h3 className="text-sm sm:text-base font-semibold text-white">
-            Live Throughput & Sockets
-          </h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">
-            Total requests/sec and concurrent active connections
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-zinc-400" />
+            <h3 className="text-sm sm:text-base font-semibold text-zinc-100">
+              Throughput & Active Sockets
+            </h3>
+          </div>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Real-time HTTP requests per second and open client socket count
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 font-mono text-xs">
+          <span className="px-2 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-emerald-400 font-semibold">
+            {latestRps} req/s
+          </span>
+          <span className="px-2 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-amber-400 font-semibold">
+            {latestConns} sockets
+          </span>
         </div>
       </div>
 
-      <div className="h-56 sm:h-64 lg:h-72 w-full">
+      <div className="h-60 sm:h-64 lg:h-72 w-full">
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
               <defs>
-                <linearGradient id="rpsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                <linearGradient id="rpsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
-                <linearGradient id="connsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
+                <linearGradient id="connsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
-              <YAxis stroke="#64748b" tick={{ fontSize: 10 }} allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <XAxis dataKey="time" stroke="#71717a" tick={{ fontSize: 10 }} />
+              <YAxis stroke="#71717a" tick={{ fontSize: 10 }} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#0f172a',
-                  borderColor: '#334155',
-                  borderRadius: '8px',
-                  color: '#f8fafc',
+                  backgroundColor: '#18181b',
+                  borderColor: '#3f3f46',
+                  borderRadius: '6px',
+                  color: '#f4f4f5',
                   fontSize: '11px',
+                  fontFamily: 'monospace',
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+              <Legend
+                wrapperStyle={{
+                  fontSize: '11px',
+                  fontFamily: 'monospace',
+                  paddingTop: '8px',
+                }}
+              />
               <Area
                 type="monotone"
                 dataKey="rps"
                 name="RPS (req/s)"
-                stroke="#14b8a6"
-                strokeWidth={2}
+                stroke="#10b981"
+                strokeWidth={1.5}
                 fillOpacity={1}
-                fill="url(#rpsGradient)"
+                fill="url(#rpsGrad)"
               />
               <Area
                 type="monotone"
                 dataKey="activeConnections"
                 name="Active Sockets"
                 stroke="#f59e0b"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 fillOpacity={1}
-                fill="url(#connsGradient)"
+                fill="url(#connsGrad)"
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-slate-500 text-xs sm:text-sm">
-            Waiting for live metric samples...
+          <div className="h-full flex items-center justify-center text-zinc-500 text-xs sm:text-sm font-mono">
+            Awaiting streaming metric samples...
           </div>
         )}
       </div>

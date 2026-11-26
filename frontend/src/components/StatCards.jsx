@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Server, Zap, Clock, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Activity, Server, Zap, Clock, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
   const rps = latestMetric?.rps || 0;
@@ -10,83 +10,111 @@ export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
   const currentCount = servers?.length || 0;
   const minCount = policy?.minServers || 2;
   const maxCount = policy?.maxServers || 10;
+  const capacityPercent = Math.min(100, Math.round((currentCount / maxCount) * 100));
 
   const cards = [
     {
-      title: 'Requests / Sec',
+      title: 'Throughput',
       value: rps.toLocaleString(),
-      subtext: `${(errorRate * 100).toFixed(1)}% error rate`,
+      unit: 'req/s',
+      detail: `${(errorRate * 100).toFixed(1)}% error rate`,
       icon: Activity,
-      color: 'text-teal-400',
-      bg: 'bg-teal-500/10 border-teal-500/20',
+      iconColor: 'text-emerald-400',
+      iconBg: 'bg-emerald-500/10 border-emerald-500/20',
       span: '',
     },
     {
       title: 'Active Connections',
       value: activeConns.toLocaleString(),
-      subtext: 'In-flight sockets',
+      unit: 'sockets',
+      detail: 'In-flight client sockets',
       icon: Zap,
-      color: 'text-amber-400',
-      bg: 'bg-amber-500/10 border-amber-500/20',
+      iconColor: 'text-amber-400',
+      iconBg: 'bg-amber-500/10 border-amber-500/20',
       span: '',
     },
     {
-      title: 'Response Latency',
-      value: `${avgLatency} ms`,
-      subtext: `p95: ${p95Latency} ms`,
+      title: 'Average Latency',
+      value: avgLatency,
+      unit: 'ms',
+      detail: `p95 percentile: ${p95Latency} ms`,
       icon: Clock,
-      color: avgLatency > 400 ? 'text-rose-400' : 'text-blue-400',
-      bg:
-        avgLatency > 400
-          ? 'bg-rose-500/10 border-rose-500/20'
-          : 'bg-blue-500/10 border-blue-500/20',
+      iconColor: avgLatency > 400 ? 'text-rose-400' : 'text-sky-400',
+      iconBg: avgLatency > 400 ? 'bg-rose-500/10 border-rose-500/20' : 'bg-sky-500/10 border-sky-500/20',
       span: '',
     },
     {
       title: 'Fleet Capacity',
       value: `${currentCount} / ${maxCount}`,
-      subtext: `Min fleet: ${minCount}`,
+      unit: 'nodes',
+      detail: `Min baseline: ${minCount} nodes`,
       icon: Server,
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-500/10 border-emerald-500/20',
+      iconColor: 'text-indigo-400',
+      iconBg: 'bg-indigo-500/10 border-indigo-500/20',
       span: '',
+      hasProgress: true,
+      progress: capacityPercent,
     },
     {
-      title: 'Autoscaler State',
-      value: isScaling ? 'Scaling...' : mode === 'paused' ? 'Paused' : 'Active (Auto)',
-      subtext: isScaling ? 'Adjusting fleet' : 'Loop running (5s)',
-      icon: mode === 'paused' ? AlertTriangle : ShieldCheck,
-      color: isScaling
-        ? 'text-purple-400 animate-pulse'
-        : mode === 'paused'
-          ? 'text-amber-400'
-          : 'text-teal-400',
-      bg: isScaling
-        ? 'bg-purple-500/10 border-purple-500/20'
-        : 'bg-slate-800/50 border-slate-700/50',
+      title: 'Autoscaler',
+      value: isScaling ? 'Scaling Fleet' : mode === 'paused' ? 'Paused' : 'Active Loop',
+      unit: mode === 'paused' ? 'manual' : '5s eval',
+      detail: isScaling ? 'Adjusting backend node count' : 'Policy bounds nominal',
+      icon: mode === 'paused' ? AlertCircle : ShieldCheck,
+      iconColor: isScaling ? 'text-purple-400' : mode === 'paused' ? 'text-amber-400' : 'text-emerald-400',
+      iconBg: isScaling ? 'bg-purple-500/10 border-purple-500/20' : mode === 'paused' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20',
       span: 'col-span-2 sm:col-span-1 lg:col-span-1',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
       {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
           <div
             key={idx}
-            className={`p-3 sm:p-4 rounded-xl border backdrop-blur-md transition-all hover:scale-[1.01] ${card.bg} ${card.span}`}
+            className={`bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700/80 transition-all rounded-lg p-3.5 sm:p-4 flex flex-col justify-between ${card.span}`}
           >
-            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-              <span className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider truncate">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider truncate">
                 {card.title}
               </span>
-              <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${card.color}`} />
+              <div className={`p-1.5 rounded-md border ${card.iconBg} shrink-0`}>
+                <Icon className={`w-3.5 h-3.5 ${card.iconColor}`} />
+              </div>
             </div>
-            <div className="text-lg sm:text-2xl font-bold tracking-tight text-white mb-0.5 sm:mb-1 truncate">
-              {card.value}
+
+            <div className="my-1">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl sm:text-2xl font-mono font-semibold tracking-tight text-zinc-100">
+                  {card.value}
+                </span>
+                {card.unit && (
+                  <span className="text-xs font-mono text-zinc-500">
+                    {card.unit}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="text-[11px] sm:text-xs text-slate-400 truncate">{card.subtext}</div>
+
+            {card.hasProgress ? (
+              <div className="mt-2">
+                <div className="w-full bg-zinc-800/80 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 transition-all duration-300"
+                    style={{ width: `${card.progress}%` }}
+                  />
+                </div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-1.5 truncate">
+                  {card.detail}
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] font-mono text-zinc-400 mt-2 truncate">
+                {card.detail}
+              </div>
+            )}
           </div>
         );
       })}

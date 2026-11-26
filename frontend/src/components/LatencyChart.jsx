@@ -10,8 +10,9 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
+import { Clock } from 'lucide-react';
 
-export function LatencyChart({ data, policy }) {
+export function LatencyChart({ data = [], policy }) {
   const outCpuThreshold = policy?.outCpu || 70;
   const outLatencyThreshold = policy?.outLatency || 500;
 
@@ -26,41 +27,65 @@ export function LatencyChart({ data, policy }) {
     cpu: d.cpuAvg || 0,
   }));
 
+  const latestAvg = chartData.length > 0 ? chartData[chartData.length - 1].avgLatency : 0;
+  const latestP95 = chartData.length > 0 ? chartData[chartData.length - 1].p95Latency : 0;
+
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 sm:p-5 backdrop-blur-md">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 sm:mb-4">
+    <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-zinc-800/80">
         <div>
-          <h3 className="text-sm sm:text-base font-semibold text-white">Latency & CPU Pressures</h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">
-            Response time (ms) and CPU % with scaling breach threshold
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-zinc-400" />
+            <h3 className="text-sm sm:text-base font-semibold text-zinc-100">
+              Response Latency & CPU Pressure
+            </h3>
+          </div>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Round-trip latency percentiles and cluster average CPU load
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 font-mono text-xs">
+          <span className="px-2 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-sky-400 font-semibold">
+            avg {latestAvg}ms
+          </span>
+          <span className="px-2 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-violet-400 font-semibold">
+            p95 {latestP95}ms
+          </span>
         </div>
       </div>
 
-      <div className="h-56 sm:h-64 lg:h-72 w-full">
+      <div className="h-60 sm:h-64 lg:h-72 w-full">
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
-              <YAxis yAxisId="left" stroke="#64748b" tick={{ fontSize: 10 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <XAxis dataKey="time" stroke="#71717a" tick={{ fontSize: 10 }} />
+              <YAxis yAxisId="left" stroke="#71717a" tick={{ fontSize: 10 }} />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 domain={[0, 100]}
-                stroke="#64748b"
+                stroke="#71717a"
                 tick={{ fontSize: 10 }}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#0f172a',
-                  borderColor: '#334155',
-                  borderRadius: '8px',
-                  color: '#f8fafc',
+                  backgroundColor: '#18181b',
+                  borderColor: '#3f3f46',
+                  borderRadius: '6px',
+                  color: '#f4f4f5',
                   fontSize: '11px',
+                  fontFamily: 'monospace',
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+              <Legend
+                wrapperStyle={{
+                  fontSize: '11px',
+                  fontFamily: 'monospace',
+                  paddingTop: '8px',
+                }}
+              />
 
               <ReferenceLine
                 yAxisId="left"
@@ -68,7 +93,7 @@ export function LatencyChart({ data, policy }) {
                 stroke="#f43f5e"
                 strokeDasharray="4 4"
                 label={{
-                  value: 'p95 Limit',
+                  value: 'Limit',
                   fill: '#f43f5e',
                   fontSize: 10,
                   position: 'insideTopRight',
@@ -77,11 +102,11 @@ export function LatencyChart({ data, policy }) {
               <ReferenceLine
                 yAxisId="right"
                 y={outCpuThreshold}
-                stroke="#fb923c"
+                stroke="#f97316"
                 strokeDasharray="4 4"
                 label={{
-                  value: 'CPU Target',
-                  fill: '#fb923c',
+                  value: 'Target',
+                  fill: '#f97316',
                   fontSize: 10,
                   position: 'insideTopLeft',
                 }}
@@ -93,7 +118,7 @@ export function LatencyChart({ data, policy }) {
                 dataKey="avgLatency"
                 name="Avg Latency (ms)"
                 stroke="#38bdf8"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 dot={false}
               />
               <Line
@@ -102,7 +127,7 @@ export function LatencyChart({ data, policy }) {
                 dataKey="p95Latency"
                 name="p95 Latency (ms)"
                 stroke="#a855f7"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 dot={false}
               />
               <Line
@@ -111,14 +136,14 @@ export function LatencyChart({ data, policy }) {
                 dataKey="cpu"
                 name="CPU (%)"
                 stroke="#22c55e"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-slate-500 text-xs sm:text-sm">
-            Waiting for latency and CPU data...
+          <div className="h-full flex items-center justify-center text-zinc-500 text-xs sm:text-sm font-mono">
+            Awaiting streaming metric samples...
           </div>
         )}
       </div>
