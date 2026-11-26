@@ -11,17 +11,22 @@ const logger = createLogger('autoscaler-controller');
 export class AutoscalerController extends EventEmitter {
   constructor(options = {}) {
     super();
-    this.lbAdminUrl = (options.lbAdminUrl || `http://127.0.0.1:${config.lbAdminPort}`).replace(/\/$/, '');
+    this.lbAdminUrl = (options.lbAdminUrl || `http://127.0.0.1:${config.lbAdminPort}`).replace(
+      /\/$/,
+      ''
+    );
     this.lbUrl = (options.lbUrl || `http://127.0.0.1:${config.lbPort}`).replace(/\/$/, '');
     this.adminToken = options.adminToken || config.adminToken;
     this.evalIntervalMs = options.evalIntervalMs || config.evalIntervalMs || 5000;
     this.drainTimeoutMs = options.drainTimeoutMs || config.drainTimeoutMs || 30000;
 
     this.metricsStore = options.metricsStore || new MetricsStore();
-    this.policy = options.policy || new PolicyEngine({
-      minServers: options.minServers || config.minServers,
-      maxServers: options.maxServers || config.maxServers,
-    });
+    this.policy =
+      options.policy ||
+      new PolicyEngine({
+        minServers: options.minServers || config.minServers,
+        maxServers: options.maxServers || config.maxServers,
+      });
     this.db = options.db || new DatabaseService(options.dbPath);
     this.provisioner = options.provisioner || new ProcessProvisioner(options);
 
@@ -199,7 +204,10 @@ export class AutoscalerController extends EventEmitter {
             signal: AbortSignal.timeout(5000),
           });
         } catch (regErr) {
-          logger.error({ err: regErr.message, id: instance.id }, 'Failed to register server with LB');
+          logger.error(
+            { err: regErr.message, id: instance.id },
+            'Failed to register server with LB'
+          );
         }
 
         const serversAfter = this.servers.size;
@@ -234,7 +242,10 @@ export class AutoscalerController extends EventEmitter {
     try {
       for (let i = 0; i < count; i++) {
         if (this.servers.size <= minServers) {
-          logger.warn({ count: this.servers.size, minServers }, 'Cannot scale in: min servers reached');
+          logger.warn(
+            { count: this.servers.size, minServers },
+            'Cannot scale in: min servers reached'
+          );
           break;
         }
 
@@ -246,7 +257,10 @@ export class AutoscalerController extends EventEmitter {
         candidates.sort((a, b) => (a.activeConnections || 0) - (b.activeConnections || 0));
         const victim = candidates[0];
 
-        logger.info({ victimId: victim.id, activeConnections: victim.activeConnections }, 'Initiating graceful server drain');
+        logger.info(
+          { victimId: victim.id, activeConnections: victim.activeConnections },
+          'Initiating graceful server drain'
+        );
 
         victim.state = 'draining';
         try {
@@ -346,7 +360,10 @@ export class AutoscalerController extends EventEmitter {
     this.emit('servers', this.getServerList());
 
     if (this.servers.size < minServers) {
-      logger.info({ current: this.servers.size, minServers }, 'Recovering lost capacity; launching replacement server');
+      logger.info(
+        { current: this.servers.size, minServers },
+        'Recovering lost capacity; launching replacement server'
+      );
       await this.scaleOut(minServers - this.servers.size, 'Automatic crash recovery replacement');
     }
   }

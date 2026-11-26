@@ -12,7 +12,11 @@ import {
 
 export function RpsChart({ data }) {
   const chartData = (data || []).map((d) => ({
-    time: new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    time: new Date(d.ts).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }),
     rps: d.rps || 0,
     activeConnections: d.activeConnections || d.activeConns || 0,
   }));
@@ -21,8 +25,12 @@ export function RpsChart({ data }) {
     <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 sm:p-5 backdrop-blur-md">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 sm:mb-4">
         <div>
-          <h3 className="text-sm sm:text-base font-semibold text-white">Live Throughput & Sockets</h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">Total requests/sec and concurrent active connections</p>
+          <h3 className="text-sm sm:text-base font-semibold text-white">
+            Live Throughput & Sockets
+          </h3>
+          <p className="text-[11px] sm:text-xs text-slate-400">
+            Total requests/sec and concurrent active connections
+          </p>
         </div>
       </div>
 

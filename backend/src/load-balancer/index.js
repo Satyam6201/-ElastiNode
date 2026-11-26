@@ -142,7 +142,10 @@ export function createLoadBalancer(options = {}) {
           const alternateServers = pool.getHealthyServers().filter((s) => s.id !== server.id);
           if (alternateServers.length > 0) {
             const nextServer = algorithm.select(alternateServers, req) || alternateServers[0];
-            logger.warn({ failedServer: server.id, nextServer: nextServer.id }, 'Retrying request on alternate server');
+            logger.warn(
+              { failedServer: server.id, nextServer: nextServer.id },
+              'Retrying request on alternate server'
+            );
             attemptProxy(nextServer);
             return;
           }

@@ -47,7 +47,9 @@ export async function runLoadTest(options = {}) {
         requests: result.requests.total,
         rps: Math.round(result.requests.average),
         avgLatencyMs: Math.round(result.latency.average),
-        p95LatencyMs: Math.round(result.latency.p97_5 || result.latency.p90 || result.latency.average),
+        p95LatencyMs: Math.round(
+          result.latency.p97_5 || result.latency.p90 || result.latency.average
+        ),
         throughputMb: Math.round((result.throughput.average / (1024 * 1024)) * 10) / 10,
         errors: result.errors,
         timeouts: result.timeouts,

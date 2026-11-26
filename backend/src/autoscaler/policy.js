@@ -92,9 +92,7 @@ export class PolicyEngine {
       load.rpsPerServer > this.config.outRps ||
       load.p95 > this.config.outLatency;
 
-    const isIdle =
-      load.cpu < this.config.inCpu &&
-      load.rpsPerServer < this.config.inRps;
+    const isIdle = load.cpu < this.config.inCpu && load.rpsPerServer < this.config.inRps;
 
     this.state.outBreaches = isOverloaded ? this.state.outBreaches + 1 : 0;
     this.state.inBreaches = isIdle ? this.state.inBreaches + 1 : 0;

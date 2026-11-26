@@ -16,7 +16,11 @@ export function LatencyChart({ data, policy }) {
   const outLatencyThreshold = policy?.outLatency || 500;
 
   const chartData = (data || []).map((d) => ({
-    time: new Date(d.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    time: new Date(d.ts).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }),
     avgLatency: d.avgLatencyMs || d.avgLatency || 0,
     p95Latency: d.p95LatencyMs || d.p95Latency || 0,
     cpu: d.cpuAvg || 0,
@@ -27,7 +31,9 @@ export function LatencyChart({ data, policy }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 sm:mb-4">
         <div>
           <h3 className="text-sm sm:text-base font-semibold text-white">Latency & CPU Pressures</h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">Response time (ms) and CPU % with scaling breach threshold</p>
+          <p className="text-[11px] sm:text-xs text-slate-400">
+            Response time (ms) and CPU % with scaling breach threshold
+          </p>
         </div>
       </div>
 
@@ -38,7 +44,13 @@ export function LatencyChart({ data, policy }) {
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
               <YAxis yAxisId="left" stroke="#64748b" tick={{ fontSize: 10 }} />
-              <YAxis yAxisId="right" orientation="right" domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 10 }} />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                domain={[0, 100]}
+                stroke="#64748b"
+                tick={{ fontSize: 10 }}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#0f172a',
@@ -55,14 +67,24 @@ export function LatencyChart({ data, policy }) {
                 y={outLatencyThreshold}
                 stroke="#f43f5e"
                 strokeDasharray="4 4"
-                label={{ value: 'p95 Limit', fill: '#f43f5e', fontSize: 10, position: 'insideTopRight' }}
+                label={{
+                  value: 'p95 Limit',
+                  fill: '#f43f5e',
+                  fontSize: 10,
+                  position: 'insideTopRight',
+                }}
               />
               <ReferenceLine
                 yAxisId="right"
                 y={outCpuThreshold}
                 stroke="#fb923c"
                 strokeDasharray="4 4"
-                label={{ value: 'CPU Target', fill: '#fb923c', fontSize: 10, position: 'insideTopLeft' }}
+                label={{
+                  value: 'CPU Target',
+                  fill: '#fb923c',
+                  fontSize: 10,
+                  position: 'insideTopLeft',
+                }}
               />
 
               <Line

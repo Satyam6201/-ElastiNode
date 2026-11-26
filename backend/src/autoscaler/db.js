@@ -67,13 +67,29 @@ export class DatabaseService {
     `);
   }
 
-  insertEvent({ type, serverId = null, reason = '', serversBefore = 0, serversAfter = 0, metrics = {} }) {
+  insertEvent({
+    type,
+    serverId = null,
+    reason = '',
+    serversBefore = 0,
+    serversAfter = 0,
+    metrics = {},
+  }) {
     const ts = Date.now();
     const metricsJson = JSON.stringify(metrics);
 
     if (this.isMemory || !this.db) {
       const id = this.memoryStore.events.length + 1;
-      this.memoryStore.events.unshift({ id, ts, type, serverId, reason, serversBefore, serversAfter, metricsJson });
+      this.memoryStore.events.unshift({
+        id,
+        ts,
+        type,
+        serverId,
+        reason,
+        serversBefore,
+        serversAfter,
+        metricsJson,
+      });
       return id;
     }
 
@@ -94,12 +110,30 @@ export class DatabaseService {
     return stmt.all(limit);
   }
 
-  insertMetric({ rps = 0, avgLatency = 0, p95Latency = 0, cpuAvg = 0, activeConns = 0, serverCount = 0, errorRate = 0 }) {
+  insertMetric({
+    rps = 0,
+    avgLatency = 0,
+    p95Latency = 0,
+    cpuAvg = 0,
+    activeConns = 0,
+    serverCount = 0,
+    errorRate = 0,
+  }) {
     const ts = Date.now();
 
     if (this.isMemory || !this.db) {
       const id = this.memoryStore.metrics.length + 1;
-      this.memoryStore.metrics.push({ id, ts, rps, avgLatency, p95Latency, cpuAvg, activeConns, serverCount, errorRate });
+      this.memoryStore.metrics.push({
+        id,
+        ts,
+        rps,
+        avgLatency,
+        p95Latency,
+        cpuAvg,
+        activeConns,
+        serverCount,
+        errorRate,
+      });
       return id;
     }
 
@@ -107,7 +141,16 @@ export class DatabaseService {
       INSERT INTO metrics (ts, rps, avgLatency, p95Latency, cpuAvg, activeConns, serverCount, errorRate)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const info = stmt.run(ts, rps, avgLatency, p95Latency, cpuAvg, activeConns, serverCount, errorRate);
+    const info = stmt.run(
+      ts,
+      rps,
+      avgLatency,
+      p95Latency,
+      cpuAvg,
+      activeConns,
+      serverCount,
+      errorRate
+    );
     return info.lastInsertRowid;
   }
 

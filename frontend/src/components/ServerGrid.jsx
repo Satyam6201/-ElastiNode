@@ -87,11 +87,7 @@ export function ServerGrid({ servers, onDrainServer }) {
                 <div className="w-full bg-slate-700/50 h-1.5 sm:h-2 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${
-                      cpu > 75
-                        ? 'bg-rose-500'
-                        : cpu > 50
-                        ? 'bg-amber-400'
-                        : 'bg-teal-400'
+                      cpu > 75 ? 'bg-rose-500' : cpu > 50 ? 'bg-amber-400' : 'bg-teal-400'
                     }`}
                     style={{ width: `${Math.min(100, Math.max(5, cpu))}%` }}
                   />

@@ -100,7 +100,8 @@ export class BackendPool extends EventEmitter {
     s.activeConnections = Math.max(0, s.activeConnections - 1);
 
     if (latencyMs >= 0) {
-      s.avgLatencyMs = s.avgLatencyMs === 0 ? latencyMs : Math.round(s.avgLatencyMs * 0.8 + latencyMs * 0.2);
+      s.avgLatencyMs =
+        s.avgLatencyMs === 0 ? latencyMs : Math.round(s.avgLatencyMs * 0.8 + latencyMs * 0.2);
     }
 
     if (isError) {

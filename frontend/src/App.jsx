@@ -63,7 +63,9 @@ export function App() {
                 }`}
               />
               <span className={`text-xs ${isConnected ? 'text-slate-300' : 'text-rose-400'}`}>
-                <span className="hidden sm:inline">{isConnected ? 'Socket.IO Live' : 'Disconnected'}</span>
+                <span className="hidden sm:inline">
+                  {isConnected ? 'Socket.IO Live' : 'Disconnected'}
+                </span>
                 <span className="sm:hidden">{isConnected ? 'Live' : 'Offline'}</span>
               </span>
             </div>

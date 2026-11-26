@@ -38,7 +38,13 @@ const LoadTestSchema = z.object({
   scenario: z.enum(['standard', 'spike', 'ramp-up']).default('standard').optional(),
 });
 
-export function createAutoscalerApi({ controller, db, socketBroadcaster, adminToken, onRunLoadTest }) {
+export function createAutoscalerApi({
+  controller,
+  db,
+  socketBroadcaster,
+  adminToken,
+  onRunLoadTest,
+}) {
   const app = express();
   app.use(helmet());
   app.use(cors());

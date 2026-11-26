@@ -40,7 +40,9 @@ export function LoadTestPanel({ onTriggerLoadTest }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
         <div className="p-2.5 sm:p-3 bg-slate-800/40 rounded-lg border border-slate-700/50">
           <div className="flex justify-between items-center text-xs mb-2">
-            <span className="text-slate-400 font-medium text-[11px] sm:text-xs">Target Throughput</span>
+            <span className="text-slate-400 font-medium text-[11px] sm:text-xs">
+              Target Throughput
+            </span>
             <span className="font-mono font-bold text-teal-400 text-xs sm:text-sm">{rps} RPS</span>
           </div>
           <input
@@ -63,7 +65,9 @@ export function LoadTestPanel({ onTriggerLoadTest }) {
         <div className="p-2.5 sm:p-3 bg-slate-800/40 rounded-lg border border-slate-700/50">
           <div className="flex justify-between items-center text-xs mb-2">
             <span className="text-slate-400 font-medium text-[11px] sm:text-xs">Test Duration</span>
-            <span className="font-mono font-bold text-amber-400 text-xs sm:text-sm">{duration}s</span>
+            <span className="font-mono font-bold text-amber-400 text-xs sm:text-sm">
+              {duration}s
+            </span>
           </div>
           <input
             type="range"
@@ -83,7 +87,9 @@ export function LoadTestPanel({ onTriggerLoadTest }) {
         </div>
 
         <div className="p-2.5 sm:p-3 bg-slate-800/40 rounded-lg border border-slate-700/50 col-span-1 sm:col-span-2 lg:col-span-1">
-          <label className="text-slate-400 text-[11px] sm:text-xs block mb-2 font-medium">Traffic Pattern</label>
+          <label className="text-slate-400 text-[11px] sm:text-xs block mb-2 font-medium">
+            Traffic Pattern
+          </label>
           <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
             {[
               { id: 'standard', label: 'Sustained' },

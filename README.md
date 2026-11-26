@@ -86,16 +86,11 @@ ElastiNode/
 │   │   │   ├── policy.js
 │   │   │   ├── metricsStore.js
 │   │   │   ├── processProvisioner.js
-│   │   │   ├── baseProvisioner.js
 │   │   │   ├── db.js
 │   │   │   ├── api.js
 │   │   │   └── socket.js
 │   │   └── load-tester/            (Autocannon traffic benchmarking)
 │   │       └── run.js
-│   ├── test/
-│   │   ├── algorithms.test.js
-│   │   ├── policy.test.js
-│   │   └── integration.test.js
 │   └── package.json
 ├── frontend/                       (React + Vite + Tailwind CSS dashboard)
 │   ├── src/
@@ -143,10 +138,7 @@ ElastiNode/
      - Instructs LB to set node state to `draining`.
      - Waits until `activeConnections == 0` before sending termination signal.
    - **Crash Recovery**: Automatically detects crashed node processes and spawns healthy replacements immediately.
-   - **Pluggable Provisioners**:
-     - `ProcessProvisioner` (default; forks Node child processes with automatic port allocation).
-     - `DockerProvisioner` (Dockerode container lifecycle management with local fallback).
-     - `CloudProvisioner` (stubs with documented hooks for AWS ASG & Kubernetes API).
+   - **Process Provisioner**: Forks Node child processes with automatic port allocation and graceful lifecycle tracking.
 
 4. **Real-Time React + Tailwind CSS Dashboard (`:3000` or `:9000`)**
    - **Stat Cards**: Instant view of RPS, active sockets, avg/p95 latency, error rates, and fleet capacity.
@@ -160,40 +152,39 @@ ElastiNode/
 
 ## 📋 Port Allocations
 
-| Service | Port | Description |
-|---|---|---|
-| Load Balancer Proxy | `8080` | Public reverse proxy entry point for all traffic |
-| Load Balancer Admin API | `8081` | Dynamic registry, draining, algorithm swapping (localhost only) |
-| Autoscaler Service | `9000` | REST API, Socket.IO server, and static dashboard host |
-| React Dashboard (Dev) | `3000` | Vite development server with hot-reload |
-| Backend Nodes | `4001+` | Dynamically provisioned Node.js Express microservices |
+| Service                 | Port    | Description                                                     |
+| ----------------------- | ------- | --------------------------------------------------------------- |
+| Load Balancer Proxy     | `8080`  | Public reverse proxy entry point for all traffic                |
+| Load Balancer Admin API | `8081`  | Dynamic registry, draining, algorithm swapping (localhost only) |
+| Autoscaler Service      | `9000`  | REST API, Socket.IO server, and static dashboard host           |
+| React Dashboard (Dev)   | `3000`  | Vite development server with hot-reload                         |
+| Backend Nodes           | `4001+` | Dynamically provisioned Node.js Express microservices           |
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 20+ (tested on Node v22.14.0)
 - npm 10+
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Run the Full Test Suite
-Runs all 57 unit, integration, and policy tests across the monorepo:
-```bash
-npm test
-```
+### 2. Start ElastiNode
 
-### 3. Start ElastiNode
 Starts the Load Balancer, Autoscaler, baseline `minServers` (2 nodes), and the React Dashboard:
+
 ```bash
 npm run dev
 ```
 
 Open your browser to:
+
 - **Interactive Dashboard**: [http://localhost:3000](http://localhost:3000) (or [http://localhost:9000](http://localhost:9000))
 - **Load Balancer Proxy**: [http://localhost:8080](http://localhost:8080)
 
@@ -202,14 +193,17 @@ Open your browser to:
 ## 🧪 Demo Walkthrough
 
 ### Scenario 1: Verify Round-Robin Load Balancing
+
 Send 10 requests to the Load Balancer:
+
 ```bash
-# In PowerShell:
 1..10 | ForEach-Object { (Invoke-WebRequest -Uri "http://localhost:8080/health").Headers['X-Served-By'] }
 ```
+
 **Result**: Requests alternate evenly between `srv-1` and `srv-2`.
 
 ### Scenario 2: Automatic Scale-Out Under Load
+
 1. Open the Dashboard at [http://localhost:3000](http://localhost:3000).
 2. In the **Live Load Generator** panel, set:
    - Target Throughput: `350 RPS`
@@ -223,6 +217,7 @@ Send 10 requests to the Load Balancer:
    - The Load Balancer immediately routes incoming traffic to the newly spawned nodes.
 
 ### Scenario 3: Graceful Scale-In (Zero Dropped Requests)
+
 1. Stop or let the load test conclude.
 2. Load drops below idle thresholds (`CPU < 30%` and `RPS/srv < 40`).
 3. After 6 consecutive idle intervals (30s) and scale-in cooldown, the Autoscaler marks the lowest-traffic node as `draining`.
@@ -230,6 +225,7 @@ Send 10 requests to the Load Balancer:
 5. The fleet contracts back to `minServers` (2).
 
 ### Scenario 4: Automatic Crash Recovery
+
 1. In the Dashboard server grid, manually drain a server or kill a backend PID from task manager/terminal.
 2. The Load Balancer passively detects the failure and routes requests to the remaining healthy node.
 3. The Autoscaler detects the crash, logs `SERVER_FAILED`, and immediately launches a replacement server to restore the minimum target capacity.
@@ -239,12 +235,9 @@ Send 10 requests to the Load Balancer:
 ## ⚙️ Configuration (.env)
 
 ```env
-# Load Balancer
 LB_PORT=8080
 LB_ADMIN_PORT=8081
 LB_ALGORITHM=round-robin
-
-# Autoscaler
 AUTOSCALER_PORT=9000
 PROVISIONER=process
 BACKEND_BASE_PORT=4001
@@ -253,8 +246,6 @@ MAX_SERVERS=10
 EVAL_INTERVAL_MS=5000
 HEALTH_INTERVAL_MS=5000
 DRAIN_TIMEOUT_MS=30000
-
-# Security
 ADMIN_TOKEN=change-me
 NODE_ENV=development
 ```
@@ -264,25 +255,29 @@ NODE_ENV=development
 ## 🐳 Docker Deployment
 
 To launch ElastiNode using Docker Compose:
+
 ```bash
 docker compose up --build
 ```
+
 This builds and starts the Load Balancer and Autoscaler container fleet in an isolated network bridge.
 
 ---
 
 ## 🛠 Development Scripts
 
-| Command | Action |
-|---|---|
-| `npm run dev` | Starts Load Balancer, Autoscaler (with baseline nodes), and React Dashboard |
-| `npm test` | Runs the full Vitest suite (policy, algorithms, pool, provisioners, integration) |
-| `npm run lint` | Runs ESLint across all packages and scripts |
-| `npm run format` | Runs Prettier code formatting |
-| `npm run build` | Builds the production Vite React dashboard bundle |
-| `npm run loadtest` | Runs the autocannon CLI traffic scenario |
+| Command                | Action                                                                      |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `npm run dev`          | Starts Load Balancer, Autoscaler (with baseline nodes), and React Dashboard |
+| `npm run dev:backend`  | Starts only the backend cluster services                                    |
+| `npm run dev:frontend` | Starts only the Vite frontend dashboard                                     |
+| `npm run lint`         | Runs ESLint across the monorepo                                             |
+| `npm run format`       | Runs Prettier code formatting                                               |
+| `npm run build`        | Builds the production Vite React dashboard bundle                           |
+| `npm run loadtest`     | Runs the autocannon CLI traffic scenario                                    |
 
 ---
 
 ## 📜 License
+
 MIT &copy; 2026 ElastiNode Team

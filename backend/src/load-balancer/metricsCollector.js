@@ -67,10 +67,7 @@ export class MetricsCollector extends EventEmitter {
       const sum = latencies.reduce((acc, val) => acc + val, 0);
       avgLatencyMs = Math.round(sum / latencies.length);
 
-      const p95Index = Math.min(
-        latencies.length - 1,
-        Math.floor(latencies.length * 0.95)
-      );
+      const p95Index = Math.min(latencies.length - 1, Math.floor(latencies.length * 0.95));
       p95LatencyMs = Math.round(latencies[p95Index]);
     }
 

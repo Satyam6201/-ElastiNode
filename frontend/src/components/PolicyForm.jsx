@@ -71,7 +71,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
             <Sliders className="w-4 h-4 text-teal-400 shrink-0" />
             Scaling Policy & Controls
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">Configure auto-scaling triggers and manual overrides</p>
+          <p className="text-[11px] sm:text-xs text-slate-400">
+            Configure auto-scaling triggers and manual overrides
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -114,7 +116,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Min Servers</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Min Servers
+            </label>
             <input
               type="number"
               name="minServers"
@@ -127,7 +131,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Max Servers (Cap)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Max Servers (Cap)
+            </label>
             <input
               type="number"
               name="maxServers"
@@ -140,7 +146,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Out CPU Threshold (%)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Out CPU Threshold (%)
+            </label>
             <input
               type="number"
               name="outCpu"
@@ -153,7 +161,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Out RPS / Server</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Out RPS / Server
+            </label>
             <input
               type="number"
               name="outRps"
@@ -166,7 +176,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Out p95 Latency (ms)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Out p95 Latency (ms)
+            </label>
             <input
               type="number"
               name="outLatency"
@@ -179,7 +191,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">In CPU Idle (%)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              In CPU Idle (%)
+            </label>
             <input
               type="number"
               name="inCpu"
@@ -192,7 +206,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Scale Out Cooldown (s)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Scale Out Cooldown (s)
+            </label>
             <input
               type="number"
               name="cooldownOutSec"
@@ -205,7 +221,9 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
           </div>
 
           <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">Scale In Cooldown (s)</label>
+            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
+              Scale In Cooldown (s)
+            </label>
             <input
               type="number"
               name="cooldownInSec"

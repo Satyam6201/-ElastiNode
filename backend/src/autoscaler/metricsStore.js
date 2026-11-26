@@ -8,7 +8,9 @@ export class MetricsStore {
     const entry = {
       ts: snapshot.ts || Date.now(),
       rps: Number.isFinite(snapshot.rps) ? snapshot.rps : 0,
-      activeConnections: Number.isFinite(snapshot.activeConnections) ? snapshot.activeConnections : 0,
+      activeConnections: Number.isFinite(snapshot.activeConnections)
+        ? snapshot.activeConnections
+        : 0,
       avgLatencyMs: Number.isFinite(snapshot.avgLatencyMs) ? snapshot.avgLatencyMs : 0,
       p95LatencyMs: Number.isFinite(snapshot.p95LatencyMs) ? snapshot.p95LatencyMs : 0,
       errorRate: Number.isFinite(snapshot.errorRate) ? snapshot.errorRate : 0,

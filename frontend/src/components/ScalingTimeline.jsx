@@ -40,7 +40,9 @@ export function ScalingTimeline({ events }) {
             <History className="w-4 h-4 text-teal-400 shrink-0" />
             Scaling Event History
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">Audit trail of autoscaler actions & crash recoveries</p>
+          <p className="text-[11px] sm:text-xs text-slate-400">
+            Audit trail of autoscaler actions & crash recoveries
+          </p>
         </div>
       </div>
 
@@ -61,11 +63,17 @@ export function ScalingTimeline({ events }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="font-bold text-[11px] sm:text-xs text-slate-200">{badge.label}</span>
-                    <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 shrink-0">{timeStr}</span>
+                    <span className="font-bold text-[11px] sm:text-xs text-slate-200">
+                      {badge.label}
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 shrink-0">
+                      {timeStr}
+                    </span>
                   </div>
                   <div className="text-slate-300 font-medium truncate text-[11px] sm:text-xs">
-                    {ev.serverId && <span className="text-teal-400 font-mono mr-1.5">{ev.serverId}</span>}
+                    {ev.serverId && (
+                      <span className="text-teal-400 font-mono mr-1.5">{ev.serverId}</span>
+                    )}
                     {ev.serversBefore != null && ev.serversAfter != null && (
                       <span className="text-slate-400 font-mono text-[10px] sm:text-[11px] mr-1.5">
                         ({ev.serversBefore} → {ev.serversAfter})

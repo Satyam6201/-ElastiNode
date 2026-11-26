@@ -36,7 +36,10 @@ export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
       subtext: `p95: ${p95Latency} ms`,
       icon: Clock,
       color: avgLatency > 400 ? 'text-rose-400' : 'text-blue-400',
-      bg: avgLatency > 400 ? 'bg-rose-500/10 border-rose-500/20' : 'bg-blue-500/10 border-blue-500/20',
+      bg:
+        avgLatency > 400
+          ? 'bg-rose-500/10 border-rose-500/20'
+          : 'bg-blue-500/10 border-blue-500/20',
       span: '',
     },
     {
@@ -53,8 +56,14 @@ export function StatCards({ latestMetric, servers, policy, mode, isScaling }) {
       value: isScaling ? 'Scaling...' : mode === 'paused' ? 'Paused' : 'Active (Auto)',
       subtext: isScaling ? 'Adjusting fleet' : 'Loop running (5s)',
       icon: mode === 'paused' ? AlertTriangle : ShieldCheck,
-      color: isScaling ? 'text-purple-400 animate-pulse' : mode === 'paused' ? 'text-amber-400' : 'text-teal-400',
-      bg: isScaling ? 'bg-purple-500/10 border-purple-500/20' : 'bg-slate-800/50 border-slate-700/50',
+      color: isScaling
+        ? 'text-purple-400 animate-pulse'
+        : mode === 'paused'
+          ? 'text-amber-400'
+          : 'text-teal-400',
+      bg: isScaling
+        ? 'bg-purple-500/10 border-purple-500/20'
+        : 'bg-slate-800/50 border-slate-700/50',
       span: 'col-span-2 sm:col-span-1 lg:col-span-1',
     },
   ];

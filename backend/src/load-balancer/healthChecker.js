@@ -36,7 +36,10 @@ export class HealthChecker {
 
       this.handleCheckFailure(server, `Probe returned status ${response.status}`);
     } catch (err) {
-      this.handleCheckFailure(server, err.name === 'TimeoutError' ? 'Probe timed out' : err.message);
+      this.handleCheckFailure(
+        server,
+        err.name === 'TimeoutError' ? 'Probe timed out' : err.message
+      );
     }
   }
 
@@ -45,7 +48,10 @@ export class HealthChecker {
     server.consecutiveSuccesses = 0;
 
     if (server.state === 'healthy' && server.consecutiveErrors >= 2) {
-      logger.warn({ id: server.id, reason, errors: server.consecutiveErrors }, 'Marking server unhealthy');
+      logger.warn(
+        { id: server.id, reason, errors: server.consecutiveErrors },
+        'Marking server unhealthy'
+      );
       this.pool.setUnhealthy(server.id, `Active check failure: ${reason}`);
     }
   }

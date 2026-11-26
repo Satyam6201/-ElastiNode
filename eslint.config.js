@@ -3,13 +3,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/build/**',
-      '**/*.sqlite*',
-      '**/*.config.js',
-    ],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/*.sqlite*', '**/*.config.js'],
   },
   js.configs.recommended,
   {
