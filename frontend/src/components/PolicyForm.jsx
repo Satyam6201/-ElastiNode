@@ -57,202 +57,234 @@ export function PolicyForm({ policy, mode, onUpdatePolicy, onTogglePause, onManu
         cooldownInMs: formData.cooldownInSec * 1000,
       });
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 2000);
+      setTimeout(() => setSaveSuccess(false), 2500);
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 sm:p-5 backdrop-blur-md">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 sm:mb-4">
+    <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-4 border-b border-zinc-800/80">
         <div>
-          <h3 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-teal-400 shrink-0" />
-            Scaling Policy & Controls
-          </h3>
-          <p className="text-[11px] sm:text-xs text-slate-400">
-            Configure auto-scaling triggers and manual overrides
+          <div className="flex items-center gap-2">
+            <Sliders className="w-4 h-4 text-zinc-400" />
+            <h3 className="text-sm sm:text-base font-semibold text-zinc-100">
+              Autoscaling Policy & Fleet Controls
+            </h3>
+            <span
+              className={`text-xs font-mono px-2 py-0.5 rounded border ${
+                mode === 'paused'
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+              }`}
+            >
+              {mode === 'paused' ? 'Paused' : 'Auto Active'}
+            </span>
+          </div>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Threshold evaluation loop and manual cluster capacity overrides
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={onTogglePause}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors border ${
               mode === 'paused'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
-                : 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700'
+                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+                : 'bg-zinc-800 text-zinc-300 border-zinc-700/80 hover:bg-zinc-700'
             }`}
           >
             {mode === 'paused' ? (
               <>
-                <Play className="w-3.5 h-3.5 fill-current" /> Resume Auto
+                <Play className="w-3.5 h-3.5 fill-current" /> Resume Autoscaling
               </>
             ) : (
               <>
-                <Pause className="w-3.5 h-3.5 fill-current" /> Pause Auto
+                <Pause className="w-3.5 h-3.5 fill-current" /> Pause Autoscaling
               </>
             )}
           </button>
 
           <button
+            type="button"
             onClick={() => onManualScale('out', 1)}
-            className="px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 flex items-center gap-1"
-            title="Force scale out +1 server"
+            className="px-2.5 py-1.5 rounded-md text-xs font-medium bg-zinc-800 text-zinc-200 border border-zinc-700/80 hover:bg-zinc-700 flex items-center gap-1"
+            title="Manual Scale Out +1 Node"
           >
-            <Plus className="w-3.5 h-3.5" /> Scale Out
+            <Plus className="w-3.5 h-3.5" /> +1 Node
           </button>
+
           <button
+            type="button"
             onClick={() => onManualScale('in', 1)}
-            className="px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 flex items-center gap-1"
-            title="Force scale in -1 server"
+            className="px-2.5 py-1.5 rounded-md text-xs font-medium bg-zinc-800 text-zinc-200 border border-zinc-700/80 hover:bg-zinc-700 flex items-center gap-1"
+            title="Manual Scale In -1 Node"
           >
-            <Minus className="w-3.5 h-3.5" /> Scale In
+            <Minus className="w-3.5 h-3.5" /> -1 Node
           </button>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Min Servers
-            </label>
-            <input
-              type="number"
-              name="minServers"
-              min="1"
-              max="20"
-              value={formData.minServers}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Max Servers (Cap)
-            </label>
-            <input
-              type="number"
-              name="maxServers"
-              min="1"
-              max="30"
-              value={formData.maxServers}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Out CPU Threshold (%)
-            </label>
-            <input
-              type="number"
-              name="outCpu"
-              min="10"
-              max="95"
-              value={formData.outCpu}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Out RPS / Server
-            </label>
-            <input
-              type="number"
-              name="outRps"
-              min="10"
-              max="5000"
-              value={formData.outRps}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Out p95 Latency (ms)
-            </label>
-            <input
-              type="number"
-              name="outLatency"
-              min="50"
-              max="5000"
-              value={formData.outLatency}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              In CPU Idle (%)
-            </label>
-            <input
-              type="number"
-              name="inCpu"
-              min="5"
-              max="50"
-              value={formData.inCpu}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Scale Out Cooldown (s)
-            </label>
-            <input
-              type="number"
-              name="cooldownOutSec"
-              min="5"
-              max="300"
-              value={formData.cooldownOutSec}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="p-2.5 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            <label className="text-slate-400 block mb-1 font-medium text-[11px] sm:text-xs">
-              Scale In Cooldown (s)
-            </label>
-            <input
-              type="number"
-              name="cooldownInSec"
-              min="10"
-              max="600"
-              value={formData.cooldownInSec}
-              onChange={handleChange}
-              className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 sm:py-1 text-slate-200 font-mono text-xs sm:text-sm focus:border-teal-500 focus:outline-none"
-            />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block mb-2">
+            Cluster Bounds
+          </span>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                Minimum Fleet Size
+              </label>
+              <input
+                type="number"
+                name="minServers"
+                min="1"
+                max="20"
+                value={formData.minServers}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                Maximum Fleet Size
+              </label>
+              <input
+                type="number"
+                name="maxServers"
+                min="1"
+                max="30"
+                value={formData.maxServers}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between sm:justify-end gap-2.5 pt-2">
-          {saveSuccess && (
-            <span className="text-xs text-emerald-400 font-medium text-center sm:text-left">
-              Policy updated successfully!
-            </span>
-          )}
+        <div>
+          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block mb-2">
+            Scale-Out Trigger Thresholds (ANY breaches)
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                CPU Utilization (&gt; %)
+              </label>
+              <input
+                type="number"
+                name="outCpu"
+                min="10"
+                max="95"
+                value={formData.outCpu}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                Throughput (&gt; RPS / Node)
+              </label>
+              <input
+                type="number"
+                name="outRps"
+                min="10"
+                max="5000"
+                value={formData.outRps}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                p95 Latency (&gt; ms)
+              </label>
+              <input
+                type="number"
+                name="outLatency"
+                min="50"
+                max="5000"
+                value={formData.outLatency}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block mb-2">
+            Scale-In Thresholds & Cooldown Delays
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                CPU Idle (&lt; %)
+              </label>
+              <input
+                type="number"
+                name="inCpu"
+                min="5"
+                max="50"
+                value={formData.inCpu}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                Scale Out Cooldown (sec)
+              </label>
+              <input
+                type="number"
+                name="cooldownOutSec"
+                min="5"
+                max="300"
+                value={formData.cooldownOutSec}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+            <div className="p-3 bg-zinc-950/60 rounded-md border border-zinc-800/80">
+              <label className="text-zinc-400 block mb-1 text-xs font-medium">
+                Scale In Cooldown (sec)
+              </label>
+              <input
+                type="number"
+                name="cooldownInSec"
+                min="10"
+                max="600"
+                value={formData.cooldownInSec}
+                onChange={handleChange}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1 text-zinc-100 font-mono text-xs focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div>
+            {saveSuccess && (
+              <span className="text-xs text-emerald-400 font-mono font-medium">
+                Policy parameters committed successfully.
+              </span>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-lg text-xs font-semibold bg-teal-500 text-slate-950 hover:bg-teal-400 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 rounded-md text-xs font-semibold bg-zinc-100 text-zinc-900 hover:bg-white active:bg-zinc-200 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isSaving ? (
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Save className="w-3.5 h-3.5" />
             )}
-            Save Policy
+            Save Configuration
           </button>
         </div>
       </form>
